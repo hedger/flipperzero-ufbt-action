@@ -50,7 +50,7 @@ runs:
         echo "::set-output name=toolchain_version::`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= $(ufbt status sdk_dir)/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`"
 
     - name: Cache toolchain
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ steps.ufbt-status.outputs.toolchain_dir }}
         key: ${{ runner.os }}-ufbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
@@ -69,12 +69,13 @@ runs:
       id: build-fap
       shell: bash
       run: |
-        cd ${{ steps.set-fap-path.outputs.fap_path }}
+        pushd ${{ steps.set-fap-path.outputs.fap_path }}
         ufbt
-        echo "::set-output name=build_artifacts::$(ls dist/*.fap)"
+        DIST_PATH=`pwd`/dist
+        echo "::set-output name=build_artifacts::$(ls $DIST_PATH/*.fap)"
 
     - name: Upload app artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: app-artifacts
         path: ${{ steps.build-fap.outputs.build_artifacts }}
