@@ -21,6 +21,9 @@ outputs:
   fap-artifacts:
     description: "Application build artifacts"
     value: ${{ steps.build-fap.outputs.build_artifacts }}
+defaults:
+  run:
+    shell: bash
 runs:
   using: "composite"
   steps:
@@ -46,7 +49,7 @@ runs:
         echo "::set-output name=toolchain_dir::$(ufbt status state_dir)/toolchain"
         echo "::set-output name=toolchain_version::`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= $(ufbt status sdk_dir)/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`"
 
-    - id: Cache toolchain
+    - name: Cache toolchain
       uses: actions/cache@v2
       with:
         path: ${{ steps.ufbt-status.outputs.toolchain_dir }}
