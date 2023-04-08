@@ -21,9 +21,6 @@ outputs:
   fap-artifacts:
     description: "Application build artifacts"
     value: ${{ steps.build-fap.outputs.build_artifacts }}
-defaults:
-  run:
-    shell: bash
 runs:
   using: "composite"
   steps:
@@ -33,16 +30,19 @@ runs:
         python-version: '3.11'
 
     - name: Install dependencies
+      shell: bash
       run: |
         python -m pip install --upgrade pip
         pip install ufbt==${{ inputs.ufbt-version }}
         
     - name: Update ufbt
+      shell: bash
       run: |
         ufbt update --channel ${{ inputs.update-channel }}
 
     - name: Extract ufbt status
       id: ufbt-status
+      shell: bash
       run: |
         echo "::set-output name=ufbt_version::$(ufbt status ufbt_version)"
         echo "::set-output name=sdk_dir::$(ufbt status sdk_dir)"
@@ -57,7 +57,8 @@ runs:
 
     - name: Set fap source path
       id: set-fap-path
-      run: >
+      shell: bash
+      run: |
         if [ -z ${{ inputs.path }} ]; then
           echo "::set-output name=fap_path::$GITHUB_WORKSPACE"
         else
@@ -66,6 +67,7 @@ runs:
     
     - name: Build app
       id: build-fap
+      shell: bash
       run: |
         cd ${{ steps.set-fap-path.outputs.fap_path }}
         ufbt
