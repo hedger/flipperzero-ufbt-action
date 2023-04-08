@@ -44,11 +44,11 @@ runs:
       id: ufbt-status
       shell: bash
       run: |
-        echo "::set-output name=ufbt_version::$(ufbt status ufbt_version)"
-        echo "::set-output name=sdk_dir::$(ufbt status sdk_dir)"
-        echo "::set-output name=toolchain_dir::$(ufbt status state_dir)/toolchain"
-        echo "::set-output name=toolchain_version::`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= $(ufbt status sdk_dir)/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`"
-
+        echo "{ufbt_version}={$(ufbt status ufbt_version)}" >> $GITHUB_OUTPUT
+        echo "{sdk_dir}={$(ufbt status sdk_dir)}" >> $GITHUB_OUTPUT
+        echo "{toolchain_dir}={$(ufbt status state_dir)/toolchain}" >> $GITHUB_OUTPUT
+        echo "{toolchain_version}={`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= $(ufbt status sdk_dir)/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`}" >> $GITHUB_STATE
+        
     - name: Cache toolchain
       uses: actions/cache@v3
       with:
@@ -60,9 +60,9 @@ runs:
       shell: bash
       run: |
         if [ -z ${{ inputs.path }} ]; then
-          echo "::set-output name=fap_path::$GITHUB_WORKSPACE"
+          echo "{fap_path}=$GITHUB_WORKSPACE" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=fap_path::${{ inputs.path }}"
+          echo "{fap_path}=$GITHUB_WORKSPACE/${{ inputs.path }}" >> $GITHUB_OUTPUT
         fi
     
     - name: Build app
@@ -72,7 +72,7 @@ runs:
         pushd ${{ steps.set-fap-path.outputs.fap_path }}
         ufbt
         DIST_PATH=`pwd`/dist
-        echo "::set-output name=build_artifacts::$(ls $DIST_PATH/*.fap)"
+        echo "{build_artifacts}=$(ls $DIST_PATH/*.fap)" >> $GITHUB_OUTPUT
 
     - name: Upload app artifacts
       uses: actions/upload-artifact@v3
