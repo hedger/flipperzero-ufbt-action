@@ -1,0 +1,75 @@
+name: 'Setup ufbt'
+description: 'Configures ufbt for use in the current project'
+inputs:
+  # ufbt-home:
+  #   description: Path to the ufbt home directory
+  #   required: false
+  #   default: ~/.ufbt
+  path:
+    description: "Path to source code (if not in the root of repository)"
+    required: false
+    default: ""
+  update-channel:
+    description: Release channel to use
+    required: false
+    default: dev
+  ufbt-version:
+    description: Version of ufbt to use
+    required: false
+    default: 0.2.1rc1
+outputs:
+  fap-artifacts:
+    description: "Application build artifacts"
+    value: ${{ steps.build-fap.outputs.build_artifacts }}
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install ufbt==${{ inputs.ufbt-version }}
+        
+    - name: Update ufbt
+      run: |
+        ufbt update --channel ${{ inputs.update-channel }}
+
+    - name: Extract ufbt status
+      id: ufbt-status
+      run: |
+        echo "::set-output name=ufbt_version::$(ufbt status ufbt_version)"
+        echo "::set-output name=sdk_dir::$(ufbt status sdk_dir)"
+        echo "::set-output name=toolchain_dir::$(ufbt status state_dir)/toolchain"
+        echo "::set-output name=toolchain_version::`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= $(ufbt status sdk_dir)/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`"
+
+    - id: Cache toolchain
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.ufbt-status.outputs.toolchain_dir }}
+        key: ${{ runner.os }}-ufbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
+
+    - name: Set fap source path
+      id: set-fap-path
+      run: >
+        if [ -z ${{ inputs.path }} ]; then
+          echo "::set-output name=fap_path::$GITHUB_WORKSPACE"
+        else
+          echo "::set-output name=fap_path::${{ inputs.path }}"
+        fi
+    
+    - name: Build app
+      id: build-fap
+      run: |
+        cd ${{ steps.set-fap-path.outputs.fap_path }}
+        ufbt
+        echo "::set-output name=build_artifacts::$(ls dist/*.fap)"
+
+    - name: Upload app artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-artifacts
+        path: ${{ steps.build-fap.outputs.build_artifacts }}

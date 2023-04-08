@@ -1,0 +1,18 @@
+on: [push]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to test ufbt action
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Test Action
+        uses: ./ # Uses an action in the root directory
+        id: hello
+        with:
+          path: 'test'
+
+      - name: Get the output FAPs
+        run: echo "Created ${{ steps.hello.outputs.fap-artifacts }}"
