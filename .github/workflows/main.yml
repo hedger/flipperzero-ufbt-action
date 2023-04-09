@@ -44,13 +44,19 @@ jobs:
           name: app-artifacts
           path: ${{ steps.build-app.outputs.fap-artifacts }}
 
+      - name: Break app
+        id: break-app
+        shell: bash
+        run: |
+          echo "static int testmain() { return 1; }" >> test/test.c
+
       - name: Lint app
         uses: ./
         id: lint-bad-app
         continue-on-error: true
         with:
           skip-setup: true
-          path: 'test_lint'
+          path: 'test'
           task: 'lint'
 
       - name: Build app
@@ -59,7 +65,7 @@ jobs:
         continue-on-error: true
         with:
           skip-setup: true
-          path: 'test_lint'
+          path: 'test'
 
       - name: Fail if lint succeeded
         if: steps.lint-bad-app.outcome == 'success' || steps.build-bad-app.outcome == 'success'
