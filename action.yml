@@ -8,32 +8,32 @@ inputs:
     default: "."
 
   sdk-channel:
-    description: Release channel to use
+    description: Release channel to use. Matches argument "--channel" for ufbt update
     required: false
     default: ""
 
   sdk-branch:
-    description: Branch to use for updates
+    description: Branch to use for updates. Matches argument "--branch" for ufbt update
     required: false
     default: ""
 
-  sdk-index:
-    description: Index to use for updates
+  sdk-index-url:
+    description: Index URL to use for updates. Matches argument "--index-url" for ufbt update
     required: false
     default: ""
 
   sdk-file:
-    description: Path to SDK archive
+    description: Path to SDK archive. Matches argument "--local" for ufbt update
     required: false
     default: ""
 
   sdk-url:
-    description: URL to SDK archive
+    description: URL to SDK archive. Matches argument "--url" for ufbt update
     required: false
     default: ""
 
   sdk-hw-target:
-    description: Hardware target to use
+    description: Hardware target to use. Matches argument "--hw-target" for ufbt update
     required: false
     default: ""
 
@@ -96,8 +96,8 @@ runs:
         if [ -n "${{ inputs.sdk-branch }}" ]; then
           UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --branch ${{ inputs.sdk-branch }}"
         fi
-        if [ -n "${{ inputs.sdk-index }}" ]; then
-          UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --index-url ${{ inputs.sdk-index }}"
+        if [ -n "${{ inputs.sdk-index-url }}" ]; then
+          UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --index-url ${{ inputs.sdk-index-url }}"
         fi
         if [ -n "${{ inputs.sdk-file }}" ]; then
           UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --local ${{ inputs.sdk-file }}"
