@@ -13,6 +13,7 @@ jobs:
         id: test1
         with:
           use-ufbt-version: 'prerelease'
+          sdk-channel: 'dev'
           path: 'test'
 
       - name: Test Action Again
