@@ -9,9 +9,9 @@ inputs:
     default: "."
 
   task: 
-    description: Task to run. Valid values: 'build', 'lint', 'none'
+    description: "Task to run. Valid values: 'build', 'lint', 'none'"
     required: false
-    default: "build"
+    default: build
 
   sdk-channel:
     description: Release channel to use. Matches argument "--channel" for ufbt update
