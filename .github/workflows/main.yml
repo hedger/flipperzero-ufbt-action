@@ -25,7 +25,7 @@ jobs:
 
       - name: Test Action unleashed
         uses: ./ # Uses an action in the root directory
-        id: test2
+        id: test3
         with:
           skip-setup: true
           path: 'test'
