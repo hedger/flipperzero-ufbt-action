@@ -46,7 +46,7 @@ jobs:
 
       - name: Lint app
         uses: ./
-        id: lint-app
+        id: lint-bad-app
         with:
           skip-setup: true
           path: 'test_lint'
@@ -54,7 +54,7 @@ jobs:
 
       - name: Build app
         uses: ./
-        id: lint-app
+        id: build-bad-app
         with:
           skip-setup: true
           path: 'test_lint'
