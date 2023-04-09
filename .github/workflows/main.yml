@@ -1,7 +1,7 @@
 on: [push]
 
 jobs:
-  hello_world_job:
+  test_ubt_build_action:
     runs-on: ubuntu-latest
     name: A job to test ufbt action
     steps:
@@ -32,5 +32,12 @@ jobs:
           sdk-channel: 'dev'
           index-url: https://up.unleashedflip.com/directory.json
 
+
       - name: Get the output FAPs
-        run: echo "Created ${{ steps.hello.outputs.fap-artifacts }}"
+        run: echo "Created ${{ steps.test3.outputs.fap-artifacts }}"
+        
+      - name: Upload app artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-artifacts
+          path: ${{ steps.test3.outputs.fap-artifacts }}
