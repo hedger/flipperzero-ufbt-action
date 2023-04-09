@@ -49,9 +49,6 @@ jobs:
         id: lint-app
         with:
           skip-setup: true
-          path: 'test'
+          path: 'test_lint'
           task: 'lint'
 
-      - name: Echo lint messages
-        if: always()
-        run: echo ${{ steps.lint-app.outputs.lint-messages }}
