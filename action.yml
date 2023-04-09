@@ -102,13 +102,20 @@ runs:
         fi
         ufbt update $UFBT_UPDATE_ARGS
 
+    - name: Get ufbt status
+      id: ufbt-raw-status
+      shell: bash
+      run: |
+        echo "ufbt_raw_status=$(ufbt status --json)" >> $GITHUB_ENV
+        echo "metadata=${{fromJSON(env.ufbt_raw_status)}}" >> $GITHUB_OUTPUT
+
     - name: Extract ufbt status
       id: ufbt-status
       shell: bash
       run: |
-        UFBT_STATE=$(ufbt status --json)
-        echo "ufbt_raw_state=${UFBT_STATE}" >> $GITHUB_STATE
-        echo "all_metadata=${{fromJSON($UFBT_STATE)}}" >> $GITHUB_ENV
+        # UFBT_STATE=$(ufbt status --json)
+        # echo "ufbt_raw_state=${UFBT_STATE}" >> $GITHUB_STATE
+        # echo "all_metadata=${{fromJSON($UFBT_STATE)}}" >> $GITHUB_ENV
 
         echo "ufbt_version=$(ufbt status ufbt_version)" >> $GITHUB_OUTPUT
         echo "sdk_dir=$(ufbt status sdk_dir)" >> $GITHUB_OUTPUT
