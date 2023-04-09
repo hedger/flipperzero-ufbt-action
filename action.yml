@@ -3,9 +3,9 @@ description: 'Configures ufbt for use in the current project'
 
 inputs:
   path:
-    description: "Path to source code (if not in the root of repository)"
+    description: "Path to source code (if not the root of repository)"
     required: false
-    default: ""
+    default: "."
 
   sdk-channel:
     description: Release channel to use
@@ -23,17 +23,17 @@ inputs:
     default: ""
 
   sdk-file:
-    description: "Path to SDK archive"
+    description: Path to SDK archive
     required: false
     default: ""
 
   sdk-url:
-    description: "URL to SDK archive"
+    description: URL to SDK archive
     required: false
     default: ""
 
   sdk-hw-target:
-    description: "Hardware target to use"
+    description: Hardware target to use
     required: false
     default: ""
 
@@ -49,7 +49,7 @@ inputs:
 
 outputs:
   sdk-version:
-    description: "SDK version"
+    description: SDK version
     value: ${{ steps.ufbt-status.outputs.ufbt_version }}
 
   fap-artifacts:
@@ -57,7 +57,7 @@ outputs:
     value: ${{ steps.build-fap.outputs.build_artifacts }}
 
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Set up Python
       uses: actions/setup-python@v3
@@ -111,23 +111,26 @@ runs:
         echo "toolchain_dir=$(ufbt status state_dir)/toolchain" >> $GITHUB_OUTPUT
         echo "toolchain_version=`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= $(ufbt status sdk_dir)/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`" >> $GITHUB_OUTPUT
         echo "actual_toolchain_version=`cat $(ufbt status state_dir)/toolchain/*/VERSION 2>/dev/null || echo 0`" >> $GITHUB_OUTPUT
+        echo "all_metadata=$(ufbt status --json)" >> $GITHUB_OUTPUT
         
     - name: Cache toolchain
       uses: actions/cache@v3
       if: steps.ufbt-status.outputs.toolchain_version != steps.ufbt-status.outputs.actual_toolchain_version
       with:
         path: ${{ steps.ufbt-status.outputs.toolchain_dir }}
-        key: ${{ runner.os }}-ufbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
+        key: ${{ runner.os }}-fbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
 
     - name: Set fap source path
       id: set-fap-path
       shell: bash
       run: |
-        if [ -z ${{ inputs.path }} ]; then
-          echo "fap_path=$GITHUB_WORKSPACE" >> $GITHUB_OUTPUT
-        else
-          echo "fap_path=$GITHUB_WORKSPACE/${{ inputs.path }}" >> $GITHUB_OUTPUT
-        fi
+        echo "Metadata for ufbt status: ${{ steps.ufbt-status.outputs.all_metadata.target }}"
+        echo "fap_path=$GITHUB_WORKSPACE/${{ inputs.path }}" >> $GITHUB_OUTPUT
+        # if [ -z ${{ inputs.path }} ]; then
+        #   echo "fap_path=$GITHUB_WORKSPACE" >> $GITHUB_OUTPUT
+        # else
+        #   echo "fap_path=$GITHUB_WORKSPACE/${{ inputs.path }}" >> $GITHUB_OUTPUT
+        # fi
     
     - name: Build app
       id: build-fap
