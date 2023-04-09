@@ -30,12 +30,12 @@ runs:
   steps:
     - name: Set up Python
       uses: actions/setup-python@v3
-      if: inputs.skip-setup == false
+      if: !inputs.skip-setup
       with:
         python-version: '3.11'
 
     - name: Install dependencies
-      if: inputs.skip-setup == false
+      if: !inputs.skip-setup
       shell: bash
       run: |
         python -m pip install --upgrade pip
