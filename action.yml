@@ -119,7 +119,7 @@ runs:
       shell: bash
       run: |
         # echo "toolchain-dir=${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}" >> $GITHUB_OUTPUT
-        echo "required-version=`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= ${{ parseJSON(steps.ufbt-status.outputs.json).sdk_dir }}/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`" >> $GITHUB_OUTPUT
+        echo "required-version=`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= ${{ fromJSON(steps.ufbt-status.outputs.json).sdk_dir }}/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`" >> $GITHUB_OUTPUT
         echo "deployed-version=`cat ${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}/*/VERSION 2>/dev/null || echo 0`" >> $GITHUB_OUTPUT
         
     - name: Cache toolchain
