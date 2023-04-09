@@ -129,7 +129,7 @@ runs:
       uses: actions/cache@v3
       if: steps.get-tooclhain-version.outputs.required-version != steps.get-tooclhain-version.outputs.deployed-version
       with:
-        path: ${{ steps.ufbt-status.outputs.toolchain_dir }}
+        path: ${{ steps.ufbt-status.outputs.status.toolchain_dir }}
         key: ${{ runner.os }}-fbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
 
     - name: Set fap source path
