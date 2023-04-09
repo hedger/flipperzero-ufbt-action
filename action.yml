@@ -1,50 +1,106 @@
-name: 'Setup ufbt'
+name: 'ufbt wrapper'
 description: 'Configures ufbt for use in the current project'
+
 inputs:
-  # ufbt-home:
-  #   description: Path to the ufbt home directory
-  #   required: false
-  #   default: ~/.ufbt
   path:
     description: "Path to source code (if not in the root of repository)"
     required: false
     default: ""
-  update-channel:
+
+  sdk-channel:
     description: Release channel to use
     required: false
-    default: dev
-  ufbt-version:
-    description: Version of ufbt to use
+    default: ""
+
+  sdk-branch:
+    description: Branch to use for updates
     required: false
-    default: 0.2.1rc1
+    default: ""
+
+  sdk-index:
+    description: Index to use for updates
+    required: false
+    default: ""
+
+  sdk-file:
+    description: "Path to SDK archive"
+    required: false
+    default: ""
+
+  sdk-url:
+    description: "URL to SDK archive"
+    required: false
+    default: ""
+
+  sdk-hw-target:
+    description: "Hardware target to use"
+    required: false
+    default: ""
+
+  use-ufbt-version:
+    description: ufbt version to use. Can be 'latest', 'prerelease' or a specific version
+    required: false
+    default: latest
+
   skip-setup:
-    description: Skip ufbt setup
+    description: Skip ufbt setup. Useful for multiple invocation of the action
     required: false
     default: ${{ false }}
+
 outputs:
+  sdk-version:
+    description: "SDK version"
+    value: ${{ steps.ufbt-status.outputs.ufbt_version }}
+
   fap-artifacts:
     description: "Application build artifacts"
     value: ${{ steps.build-fap.outputs.build_artifacts }}
+
 runs:
   using: "composite"
   steps:
     - name: Set up Python
       uses: actions/setup-python@v3
-      if: ${{ inputs.skip-setup == 'false' }} 
+      if: inputs.skip-setup == 'false'
       with:
         python-version: '3.11'
 
-    - name: Install dependencies
-      if: ${{ inputs.skip-setup == 'false' }}
+    - name: Install ufbt
+      if: inputs.skip-setup == 'false'
       shell: bash
       run: |
         python -m pip install --upgrade pip
-        pip install ufbt==${{ inputs.ufbt-version }}
+        if [ "${{ inputs.use-ufbt-version }}" == "prerelease" ]; then
+          pip install ufbt --pre
+        if [ "${{ inputs.use-ufbt-version }}" != "latest" ]; then
+          pip install ufbt==${{ inputs.use-ufbt-version }}
+        else 
+          pip install ufbt
+        fi
         
     - name: Update ufbt
       shell: bash
       run: |
-        ufbt update --channel ${{ inputs.update-channel }}
+        UFBT_UPDATE_ARGS=""
+        if [ -n "${{ inputs.sdk-hw-target }}" ]; then
+          UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --hw-target ${{ inputs.sdk-hw-target }}"
+        fi
+        if [ -n "${{ inputs.sdk-channel }}" ]; then
+          UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --channel ${{ inputs.sdk-channel }}"
+        fi
+        if [ -n "${{ inputs.sdk-branch }}" ]; then
+          UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --branch ${{ inputs.sdk-branch }}"
+        fi
+        if [ -n "${{ inputs.sdk-index }}" ]; then
+          UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --index-url ${{ inputs.sdk-index }}"
+        fi
+        if [ -n "${{ inputs.sdk-file }}" ]; then
+          UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --local ${{ inputs.sdk-file }}"
+        fi
+        if [ -n "${{ inputs.sdk-url }}" ]; then
+          UFBT_UPDATE_ARGS="$UFBT_UPDATE_ARGS --url ${{ inputs.sdk-url }}"
+        fi
+        ufbt update $UFBT_UPDATE_ARGS
 
     - name: Extract ufbt status
       id: ufbt-status

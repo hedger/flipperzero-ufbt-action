@@ -12,6 +12,7 @@ jobs:
         uses: ./ # Uses an action in the root directory
         id: test1
         with:
+          use-ufbt-version: 'prerelease'
           path: 'test'
 
       - name: Test Action Again
