@@ -1,11 +1,17 @@
-name: 'ufbt wrapper'
-description: 'Configures ufbt for use in the current project'
+name: ufbt wrapper action
+author: "@hedger"
+description: Configures ufbt for use in the current project
 
 inputs:
   path:
-    description: "Path to source code (if not the root of repository)"
+    description: Path to source code (if not the root of repository)
     required: false
     default: "."
+
+  task: 
+    description: Task to run. Valid values: 'build', 'lint', 'none'
+    required: false
+    default: "build"
 
   sdk-channel:
     description: Release channel to use. Matches argument "--channel" for ufbt update
@@ -38,7 +44,7 @@ inputs:
     default: ""
 
   use-ufbt-version:
-    description: ufbt version to use. Can be 'latest', 'prerelease' or a specific version
+    description: ufbt version to use. Can be 'latest', 'prerelease' or a specific version from PyPI
     required: false
     default: latest
 
@@ -49,15 +55,15 @@ inputs:
 
 outputs:
   fap-artifacts:
-    description: "Application build artifacts"
-    value: ${{ steps.build-fap.outputs.dist_dir }}
+    description: "Build artifacts"
+    value: ${{ steps.build-fap.outputs.build_artifacts }}
 
   fap-dir:
     description: "Directory containing application build artifacts"
-    value: ${{ steps.build-fap.outputs.build_dir }}
+    value: ${{ steps.build-fap.outputs.dist_dir }}
 
   ufbt-status:
-    description: JSON status object for ufbt
+    description: JSON status object for ufbt. Use with fromJSON()
     value: ${{ steps.ufbt-status.outputs.json }}
 
   toolchain-version:
@@ -132,6 +138,7 @@ runs:
     
     - name: Build app
       id: build-fap
+      if: inputs.task == 'build'
       shell: bash
       run: |
         FAP_SRC_PATH=$GITHUB_WORKSPACE/${{ inputs.path }}

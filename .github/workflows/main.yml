@@ -8,36 +8,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Test Action
+      - name: Setup ufbt
         uses: ./ # Uses an action in the root directory
-        id: test1
         with:
           use-ufbt-version: 'prerelease'
           sdk-channel: 'dev'
-          path: 'test'
+          task: 'none'
 
-      - name: Test Action Again
-        uses: ./ # Uses an action in the root directory
-        id: test2
+      - name: Create app
+        id: create-app
+        shell: bash
+        run: |
+          mkdir test; cd test
+          ufbt create APPID=test
+
+      - name: Build test app
+        uses: ./
+        id: build-app
         with:
           skip-setup: true
           path: 'test'
 
-      - name: Test Action unleashed
-        uses: ./ # Uses an action in the root directory
-        id: test3
+      - name: Build test app for unleashed
+        uses: ./
+        id: build-app-unleashed
         with:
           skip-setup: true
           path: 'test'
           sdk-channel: 'dev'
           sdk-index-url: https://up.unleashedflip.com/directory.json
 
-
-      - name: Get the output FAPs
-        run: echo "Created ${{ steps.test3.outputs.fap-artifacts }}"
-        
       - name: Upload app artifacts
         uses: actions/upload-artifact@v3
         with:
           name: app-artifacts
-          path: ${{ steps.test3.outputs.fap-artifacts }}
+          path: ${{ steps.build-app.outputs.fap-artifacts }}
