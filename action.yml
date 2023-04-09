@@ -72,7 +72,7 @@ runs:
         python -m pip install --upgrade pip
         if [ "${{ inputs.use-ufbt-version }}" == "prerelease" ]; then
           pip install ufbt --pre
-        if [ "${{ inputs.use-ufbt-version }}" != "latest" ]; then
+        else if [ "${{ inputs.use-ufbt-version }}" != "latest" ]; then
           pip install ufbt==${{ inputs.use-ufbt-version }}
         else 
           pip install ufbt
