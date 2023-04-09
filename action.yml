@@ -107,7 +107,7 @@ runs:
       shell: bash
       run: |
         UFBT_STATE=$(ufbt status --json)
-        echo "ufbt_raw_state=$UFBT_STATE" >> $GITHUB_STATE
+        echo "ufbt_raw_state=${UFBT_STATE}" >> $GITHUB_STATE
         echo "all_metadata=${{fromJSON($UFBT_STATE)}}" >> $GITHUB_ENV
 
         echo "ufbt_version=$(ufbt status ufbt_version)" >> $GITHUB_OUTPUT
