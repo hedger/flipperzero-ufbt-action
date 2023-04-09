@@ -70,6 +70,10 @@ outputs:
     description: Toolchain version
     value: ${{ steps.get-tooclhain-version.outputs.required-version }}
 
+  lint-messages:
+    description: Lint messages
+    value: ${{ steps.lint-app.outputs.lint-messages }}
+
 runs:
   using: composite
   steps:
@@ -146,3 +150,15 @@ runs:
         cd $FAP_SRC_PATH && ufbt
         echo "dist_dir=$DIST_PATH" >> $GITHUB_OUTPUT
         echo "build_artifacts=$(ls $DIST_PATH/*.fap)" >> $GITHUB_OUTPUT
+
+    - name: Lint sources
+      id: lint-app
+      if: inputs.task == 'lint'
+      shell: bash
+      run: |
+        FAP_SRC_PATH=$GITHUB_WORKSPACE/${{ inputs.path }}
+        # Capture output with tee and error code
+        LINT_MESSAGES=$(cd $FAP_SRC_PATH && ufbt lint 2>&1 | tee /dev/fd/2)
+        # Capture error code
+        LINT_STATUS=${PIPESTATUS[0]}
+        echo "lint-messages=$LINT_MESSAGES" >> $GITHUB_OUTPUT
