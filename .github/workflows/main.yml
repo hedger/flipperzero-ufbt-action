@@ -43,3 +43,15 @@ jobs:
         with:
           name: app-artifacts
           path: ${{ steps.build-app.outputs.fap-artifacts }}
+
+      - name: Lint app
+        uses: ./
+        id: lint-app
+        with:
+          skip-setup: true
+          path: 'test'
+          task: 'lint'
+
+      - name: Echo lint messages
+        if: always()
+        run: echo ${{ steps.lint-app.outputs.lint-messages }}
