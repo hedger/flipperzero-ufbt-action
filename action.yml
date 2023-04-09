@@ -71,11 +71,11 @@ runs:
       run: |
         python -m pip install --upgrade pip
         if [ "${{ inputs.use-ufbt-version }}" == "prerelease" ]; then
-          pip install ufbt --pre
+          pip install --upgrade --pre ufbt
         elif [ "${{ inputs.use-ufbt-version }}" != "latest" ]; then
-          pip install ufbt==${{ inputs.use-ufbt-version }}
+          pip install --upgrade ufbt==${{ inputs.use-ufbt-version }}
         else 
-          pip install ufbt
+          pip install --upgrade ufbt
         fi
         
     - name: Update ufbt
