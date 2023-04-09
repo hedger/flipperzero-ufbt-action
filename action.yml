@@ -1,6 +1,9 @@
 name: ufbt wrapper action
 author: "@hedger"
 description: Configures ufbt for use in the current project
+branding:
+  icon: 'check'
+  color: 'green'
 
 inputs:
   path:
@@ -140,6 +143,11 @@ runs:
         path: ${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}
         key: ${{ runner.os }}-fbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
     
+    - name: Add problem matcher
+      shell: bash
+      run: |
+        echo "::add-matcher::${{ github.action_path }}/ufbt-problem-matcher.json" 
+
     - name: Build app
       id: build-fap
       if: inputs.task == 'build'
