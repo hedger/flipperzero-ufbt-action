@@ -3,7 +3,7 @@ on: [push]
 jobs:
   test_ubt_build_action:
     runs-on: ubuntu-latest
-    name: A job to test ufbt action
+    name: Test ufbt action
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -47,6 +47,7 @@ jobs:
       - name: Lint app
         uses: ./
         id: lint-bad-app
+        continue-on-error: true
         with:
           skip-setup: true
           path: 'test_lint'
@@ -55,7 +56,12 @@ jobs:
       - name: Build app
         uses: ./
         id: build-bad-app
+        continue-on-error: true
         with:
           skip-setup: true
           path: 'test_lint'
+
+      - name: Fail if lint succeeded
+        if: steps.lint-bad-app.outcome == 'success' || steps.build-bad-app.outcome == 'success'
+        run: exit 1
 
