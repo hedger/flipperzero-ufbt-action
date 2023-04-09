@@ -113,10 +113,6 @@ runs:
       id: ufbt-status
       shell: bash
       run: |
-        # UFBT_STATE=$(ufbt status --json)
-        # echo "ufbt_raw_state=${UFBT_STATE}" >> $GITHUB_STATE
-        # echo "all_metadata=${{fromJSON($UFBT_STATE)}}" >> $GITHUB_ENV
-
         echo "ufbt_version=$(ufbt status ufbt_version)" >> $GITHUB_OUTPUT
         echo "sdk_dir=$(ufbt status sdk_dir)" >> $GITHUB_OUTPUT
         echo "toolchain_dir=$(ufbt status state_dir)/toolchain" >> $GITHUB_OUTPUT
