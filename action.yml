@@ -110,6 +110,8 @@ runs:
 
     - name: Parse ufbt status
       id: ufbt-status2
+      shell: bash
+      run: |
         echo "ufbt_status=${{ fromJSON(steps.ufbt-raw-status.outputs.ufbt_raw_status) }}" >> $GITHUB_OUTPUT
         echo "ufbt_status=${{ fromJSON(steps.ufbt-raw-status.outputs.ufbt_raw_status) }}" >> $GITHUB_ENV
         
