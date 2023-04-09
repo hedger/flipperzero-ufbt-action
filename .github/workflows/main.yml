@@ -10,7 +10,13 @@ jobs:
 
       - name: Test Action
         uses: ./ # Uses an action in the root directory
-        id: hello
+        id: test1
+        with:
+          path: 'test'
+
+      - name: Test Action Again
+        uses: ./ # Uses an action in the root directory
+        id: test2
         with:
           path: 'test'
 
