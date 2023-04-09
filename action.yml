@@ -48,9 +48,13 @@ inputs:
     default: ${{ false }}
 
 outputs:
-  sdk-version:
-    description: SDK version
-    value: ${{ steps.ufbt-status.outputs.ufbt_version }}
+  toolchain-version:
+    description: Toolchain version
+    value: ${{ steps.get-tooclhain-version.outputs.required-version }}
+
+  ufbt-status:
+    description: Status object for ufbt
+    value: ${{ steps.ufbt-status.outputs.status }}
 
   fap-artifacts:
     description: "Application build artifacts"
@@ -102,32 +106,28 @@ runs:
         fi
         ufbt update $UFBT_UPDATE_ARGS
 
-    - name: Get ufbt status
-      id: ufbt-raw-status
+    - name: Get ufbt status as JSON
+      id: get-ufbt-status
       shell: bash
       run: |
-        echo "ufbt_raw_status=$(ufbt status --json)" >> $GITHUB_OUTPUT
+        echo "raw=$(ufbt status --json)" >> $GITHUB_OUTPUT
 
     - name: Parse ufbt status
-      id: ufbt-status2
-      shell: bash
-      run: |
-        echo "ufbt_status=${{ fromJSON(steps.ufbt-raw-status.outputs.ufbt_raw_status) }}" >> $GITHUB_OUTPUT
-        echo "ufbt_status=${{ fromJSON(steps.ufbt-raw-status.outputs.ufbt_raw_status) }}" >> $GITHUB_ENV
-        
-    - name: Extract ufbt status
       id: ufbt-status
       shell: bash
       run: |
-        echo "ufbt_version=$(ufbt status ufbt_version)" >> $GITHUB_OUTPUT
-        echo "sdk_dir=$(ufbt status sdk_dir)" >> $GITHUB_OUTPUT
-        echo "toolchain_dir=$(ufbt status state_dir)/toolchain" >> $GITHUB_OUTPUT
-        echo "toolchain_version=`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= $(ufbt status sdk_dir)/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`" >> $GITHUB_OUTPUT
-        echo "actual_toolchain_version=`cat $(ufbt status state_dir)/toolchain/*/VERSION 2>/dev/null || echo 0`" >> $GITHUB_OUTPUT
+        echo "status=${{ fromJSON(steps.get-ufbt-status.outputs.raw) }}" >> $GITHUB_OUTPUT
+        
+    - name: Check toolchain version
+      id: get-tooclhain-version
+      shell: bash
+      run: |
+        echo "required-version=`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= ${{ steps.ufbt-status.outputs.status.sdk_dir }}/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`" >> $GITHUB_OUTPUT
+        echo "deployed-version=`cat ${{ steps.ufbt-status.outputs.status.toolchain_dir }}/*/VERSION 2>/dev/null || echo 0`" >> $GITHUB_OUTPUT
         
     - name: Cache toolchain
       uses: actions/cache@v3
-      if: steps.ufbt-status.outputs.toolchain_version != steps.ufbt-status.outputs.actual_toolchain_version
+      if: steps.get-tooclhain-version.outputs.required-version != steps.get-tooclhain-version.outputs.deployed-version
       with:
         path: ${{ steps.ufbt-status.outputs.toolchain_dir }}
         key: ${{ runner.os }}-fbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}

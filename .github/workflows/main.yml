@@ -23,5 +23,14 @@ jobs:
           skip-setup: true
           path: 'test'
 
+      - name: Test Action unleashed
+        uses: ./ # Uses an action in the root directory
+        id: test2
+        with:
+          skip-setup: true
+          path: 'test'
+          sdk-channel: 'dev'
+          index-url: https://up.unleashedflip.com/directory.json
+
       - name: Get the output FAPs
         run: echo "Created ${{ steps.hello.outputs.fap-artifacts }}"
