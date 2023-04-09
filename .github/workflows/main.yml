@@ -18,6 +18,7 @@ jobs:
         uses: ./ # Uses an action in the root directory
         id: test2
         with:
+          skip-setup: true
           path: 'test'
 
       - name: Get the output FAPs

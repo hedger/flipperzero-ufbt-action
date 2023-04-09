@@ -17,6 +17,10 @@ inputs:
     description: Version of ufbt to use
     required: false
     default: 0.2.1rc1
+  skip-setup:
+    description: Skip ufbt setup
+    required: false
+    default: false
 outputs:
   fap-artifacts:
     description: "Application build artifacts"
@@ -26,10 +30,12 @@ runs:
   steps:
     - name: Set up Python
       uses: actions/setup-python@v3
+      if: inputs.skip-setup == false
       with:
         python-version: '3.11'
 
     - name: Install dependencies
+      if: inputs.skip-setup == false
       shell: bash
       run: |
         python -m pip install --upgrade pip
