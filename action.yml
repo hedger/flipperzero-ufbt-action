@@ -50,7 +50,11 @@ inputs:
 outputs:
   fap-artifacts:
     description: "Application build artifacts"
-    value: ${{ steps.build-fap.outputs.build_artifacts }}
+    value: ${{ steps.build-fap.outputs.dist_dir }}
+
+  fap-dir:
+    description: "Directory containing application build artifacts"
+    value: ${{ steps.build-fap.outputs.build_dir }}
 
   ufbt-status:
     description: JSON status object for ufbt
@@ -60,7 +64,6 @@ outputs:
     description: Toolchain version
     value: ${{ steps.get-tooclhain-version.outputs.required-version }}
 
-
 runs:
   using: composite
   steps:
@@ -68,7 +71,7 @@ runs:
       uses: actions/setup-python@v3
       if: inputs.skip-setup == 'false'
       with:
-        python-version: '3.11'
+        python-version: '3.8'
 
     - name: Install ufbt
       if: inputs.skip-setup == 'false'
@@ -113,12 +116,10 @@ runs:
       run: |
         echo "json=$(ufbt status --json)" >> $GITHUB_OUTPUT
 
-
     - name: Check toolchain version
       id: get-tooclhain-version
       shell: bash
       run: |
-        # echo "toolchain-dir=${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}" >> $GITHUB_OUTPUT
         echo "required-version=`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= ${{ fromJSON(steps.ufbt-status.outputs.json).sdk_dir }}/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`" >> $GITHUB_OUTPUT
         echo "deployed-version=`cat ${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}/*/VERSION 2>/dev/null || echo 0`" >> $GITHUB_OUTPUT
         
@@ -128,25 +129,13 @@ runs:
       with:
         path: ${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}
         key: ${{ runner.os }}-fbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
-
-    - name: Set fap source path
-      id: set-fap-path
-      shell: bash
-      run: |
-        echo "Metadata for ufbt status: ${{ steps.ufbt-status.outputs.all_metadata.target }}"
-        echo "fap_path=$GITHUB_WORKSPACE/${{ inputs.path }}" >> $GITHUB_OUTPUT
-        # if [ -z ${{ inputs.path }} ]; then
-        #   echo "fap_path=$GITHUB_WORKSPACE" >> $GITHUB_OUTPUT
-        # else
-        #   echo "fap_path=$GITHUB_WORKSPACE/${{ inputs.path }}" >> $GITHUB_OUTPUT
-        # fi
     
     - name: Build app
       id: build-fap
       shell: bash
       run: |
-        pushd ${{ steps.set-fap-path.outputs.fap_path }}
-        ufbt
-        DIST_PATH=`pwd`/dist
+        FAP_SRC_PATH=$GITHUB_WORKSPACE/${{ inputs.path }}
+        DIST_PATH=$FAP_SRC_PATH/dist
+        cd $FAP_SRC_PATH && ufbt
+        echo "dist_dir=$DIST_PATH" >> $GITHUB_OUTPUT
         echo "build_artifacts=$(ls $DIST_PATH/*.fap)" >> $GITHUB_OUTPUT
-
