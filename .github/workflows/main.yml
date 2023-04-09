@@ -64,4 +64,3 @@ jobs:
       - name: Fail if lint succeeded
         if: steps.lint-bad-app.outcome == 'success' || steps.build-bad-app.outcome == 'success'
         run: exit 1
-
