@@ -118,7 +118,6 @@ runs:
         echo "toolchain_dir=$(ufbt status state_dir)/toolchain" >> $GITHUB_OUTPUT
         echo "toolchain_version=`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= $(ufbt status sdk_dir)/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`" >> $GITHUB_OUTPUT
         echo "actual_toolchain_version=`cat $(ufbt status state_dir)/toolchain/*/VERSION 2>/dev/null || echo 0`" >> $GITHUB_OUTPUT
-        # echo "all_metadata=${{fromJSON($UFBT_STATE)}}" >> $GITHUB_OUTPUT
         
     - name: Cache toolchain
       uses: actions/cache@v3
