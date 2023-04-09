@@ -118,15 +118,15 @@ runs:
       id: get-tooclhain-version
       shell: bash
       run: |
-        # echo "toolchain-dir=${{ parseJSON(steps.ufbt-status.outputs.json).toolchain_dir }}" >> $GITHUB_OUTPUT
+        # echo "toolchain-dir=${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}" >> $GITHUB_OUTPUT
         echo "required-version=`bash -c "export $(grep FBT_TOOLCHAIN_VERSION\= ${{ parseJSON(steps.ufbt-status.outputs.json).sdk_dir }}/scripts/toolchain/fbtenv.sh) printenv FBT_TOOLCHAIN_VERSION"`" >> $GITHUB_OUTPUT
-        echo "deployed-version=`cat ${{ parseJSON(steps.ufbt-status.outputs.json).toolchain_dir }}/*/VERSION 2>/dev/null || echo 0`" >> $GITHUB_OUTPUT
+        echo "deployed-version=`cat ${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}/*/VERSION 2>/dev/null || echo 0`" >> $GITHUB_OUTPUT
         
     - name: Cache toolchain
       uses: actions/cache@v3
       if: steps.get-tooclhain-version.outputs.required-version != steps.get-tooclhain-version.outputs.deployed-version
       with:
-        path: ${{ parseJSON(steps.ufbt-status.outputs.json).toolchain_dir }}
+        path: ${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}
         key: ${{ runner.os }}-fbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
 
     - name: Set fap source path
