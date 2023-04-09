@@ -4,7 +4,6 @@
 #include <bad_lint_icons.h>
 
 int32_t bad_lint_app(void* p) {
-    UNUSED(p);
     FURI_LOG_I("TEST", "Hello world");
 
 

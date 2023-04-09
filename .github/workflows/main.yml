@@ -52,3 +52,10 @@ jobs:
           path: 'test_lint'
           task: 'lint'
 
+      - name: Build app
+        uses: ./
+        id: lint-app
+        with:
+          skip-setup: true
+          path: 'test_lint'
+
