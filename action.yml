@@ -173,3 +173,5 @@ runs:
         echo "lint-messages<<EOF" >> $GITHUB_OUTPUT
         echo "$LINT_MESSAGES" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT        
+        # Exit with error code
+        exit $LINT_STATUS
