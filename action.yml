@@ -161,4 +161,7 @@ runs:
         LINT_MESSAGES=$(cd $FAP_SRC_PATH && ufbt lint 2>&1 | tee /dev/fd/2)
         # Capture error code
         LINT_STATUS=${PIPESTATUS[0]}
-        echo "lint-messages=$LINT_MESSAGES" >> $GITHUB_OUTPUT
+        # Save multiline output
+        echo "lint-messages<<EOF" >> $GITHUB_OUTPUT
+        echo "$LINT_MESSAGES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT        
