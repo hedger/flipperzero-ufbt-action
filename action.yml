@@ -154,7 +154,7 @@ runs:
       shell: bash
       run: |
         set +e
-        FAP_SRC_PATH=$GITHUB_WORKSPACE/${{ inputs.path }}
+        FAP_SRC_PATH=`realpath $GITHUB_WORKSPACE/${{ inputs.path }}`
         DIST_PATH=$FAP_SRC_PATH/dist
         cd $FAP_SRC_PATH
         BUILD_MESSAGES="$(ufbt -s 2>&1 | tee /dev/stderr)"
