@@ -69,6 +69,10 @@ outputs:
     description: "API version. Set by build task"
     value: ${{ steps.build-fap.outputs.api_version }}
 
+  version-line:
+    description: "String, combination of hardware target, API version & SDK version. Set by build task"
+    value: ${{ fromJSON(steps.ufbt-status.outputs.json).target }}-api-${{ steps.build-fap.outputs.api_version}}-${{ fromJSON(steps.ufbt-status.outputs.json).version }}
+
   ufbt-status:
     description: JSON status object for ufbt. Use with fromJSON()
     value: ${{ steps.ufbt-status.outputs.json }}
