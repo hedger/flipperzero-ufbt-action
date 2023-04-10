@@ -71,7 +71,7 @@ outputs:
 
   suffix:
     description: "String, combination of hardware target, API version & SDK version. Set by build task"
-    value: ${{ steps.ufbt-status.outputs.json }}
+    value: ${{ fromJSON(steps.ufbt-status.outputs.json).ufbt_version }}
 
   ufbt-status:
     description: JSON status object for ufbt. Use with fromJSON()
