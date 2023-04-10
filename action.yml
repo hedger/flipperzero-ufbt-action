@@ -46,8 +46,8 @@ inputs:
     required: false
     default: ""
 
-  use-ufbt-version:
-    description: ufbt version to use. Can be 'latest', 'prerelease' or a specific version from PyPI
+  ufbt-version:
+    description: ufbt version to use. Can be 'latest', 'prerelease' or a specific version from PyPI (e.g. '==0.2.1')
     required: false
     default: latest
 
@@ -64,6 +64,10 @@ outputs:
   fap-dir:
     description: "Directory containing application build artifacts"
     value: ${{ steps.build-fap.outputs.dist_dir }}
+
+  api-version:
+    description: "API version. Set by build task"
+    value: ${{ steps.build-fap.outputs.api_version }}
 
   ufbt-status:
     description: JSON status object for ufbt. Use with fromJSON()
@@ -91,12 +95,12 @@ runs:
       shell: bash
       run: |
         python -m pip install --upgrade pip
-        if [ "${{ inputs.use-ufbt-version }}" == "prerelease" ]; then
+        if [ "${{ inputs.ufbt-version }}" == "prerelease" ]; then
           pip install --upgrade --pre ufbt
-        elif [ "${{ inputs.use-ufbt-version }}" != "latest" ]; then
-          pip install --upgrade ufbt==${{ inputs.use-ufbt-version }}
-        else 
+        elif [ "${{ inputs.ufbt-version }}" == "latest" ]; then
           pip install --upgrade ufbt
+        else 
+          pip install --upgrade ufbt${{ inputs.ufbt-version }}
         fi
         
     - name: Update ufbt
@@ -170,6 +174,7 @@ runs:
           # Exit with error code
           exit $BUILD_STATUS
         fi
+        echo "api_version=$(ufbt -s get_apiversion || echo 0.0)" >> $GITHUB_OUTPUT
         echo "dist_dir=$DIST_PATH" >> $GITHUB_OUTPUT
         echo "build_artifacts=$(ls $DIST_PATH/*.fap)" >> $GITHUB_OUTPUT
 

@@ -11,7 +11,7 @@ jobs:
       - name: Setup ufbt
         uses: ./ # Uses an action in the root directory
         with:
-          use-ufbt-version: 'prerelease'
+          ufbt-version: 'prerelease'
           sdk-channel: 'dev'
           task: 'none'
 
@@ -41,7 +41,7 @@ jobs:
       - name: Upload app artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: app-artifacts
+          name: fap-f${{ fromJSON(steps.build-app.outputs.ufbt-status).target }}-api-${{ steps.build-app.outputs.api-version }}-v${{ fromJSON(steps.build-app.outputs.ufbt-status).version }}
           path: ${{ steps.build-app.outputs.fap-artifacts }}
 
       - name: Break app
