@@ -181,5 +181,6 @@ runs:
           echo $LINT_MESSAGES >> $GITHUB_STEP_SUMMARY
           echo "\n\`\`\`\n" >> $GITHUB_STEP_SUMMARY
           # Exit with error code
+          cat $GITHUB_STEP_SUMMARY
           exit $LINT_STATUS
         fi
