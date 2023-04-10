@@ -153,9 +153,23 @@ runs:
       if: inputs.task == 'build'
       shell: bash
       run: |
+        set +e
         FAP_SRC_PATH=$GITHUB_WORKSPACE/${{ inputs.path }}
         DIST_PATH=$FAP_SRC_PATH/dist
-        cd $FAP_SRC_PATH && ufbt
+        cd $FAP_SRC_PATH
+        BUILD_MESSAGES="$(ufbt -s 2>&1 | tee /dev/stderr)"
+        BUILD_STATUS=${PIPESTATUS[0]}
+        if [ "$BUILD_STATUS" -ne 0 ]; then
+          # Save multiline output
+          echo "build-messages<<EOF" >> $GITHUB_OUTPUT
+          echo "$BUILD_MESSAGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          printf "Build errors:\n\`\`\`\n" >> $GITHUB_STEP_SUMMARY
+          echo "$BUILD_MESSAGES" >> $GITHUB_STEP_SUMMARY
+          printf "\n\`\`\`\n" >> $GITHUB_STEP_SUMMARY
+          # Exit with error code
+          exit $BUILD_STATUS
+        fi
         echo "dist_dir=$DIST_PATH" >> $GITHUB_OUTPUT
         echo "build_artifacts=$(ls $DIST_PATH/*.fap)" >> $GITHUB_OUTPUT
 
@@ -168,7 +182,7 @@ runs:
         cd $GITHUB_WORKSPACE/${{ inputs.path }} 
         LINT_MESSAGES="$(ufbt lint -s 2>&1 | tee /dev/stderr)"
         LINT_STATUS=${PIPESTATUS[0]}
-        if [ $LINT_STATUS -eq 0 ]; then
+        if [ "$LINT_STATUS" -eq 0 ]; then
           echo "Lint passed" >> $GITHUB_STEP_SUMMARY
         else 
           # Save multiline output
