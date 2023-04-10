@@ -141,7 +141,7 @@ runs:
       if: steps.get-tooclhain-version.outputs.required-version != steps.get-tooclhain-version.outputs.deployed-version
       with:
         path: ${{ fromJSON(steps.ufbt-status.outputs.json).toolchain_dir }}
-        key: ${{ runner.os }}-fbt-toolchain-${{ steps.ufbt-status.outputs.toolchain_version }}
+        key: ${{ runner.os }}-fbt-toolchain-${{ steps.get-tooclhain-version.outputs.required-version }}
     
     - name: Add problem matcher
       shell: bash
