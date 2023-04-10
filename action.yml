@@ -181,7 +181,7 @@ runs:
         API_VERSION=$(ufbt -s get_apiversion || echo 0.0)
         echo "api_version=$API_VERSION" >> $GITHUB_OUTPUT
         echo "dist_dir=$DIST_PATH" >> $GITHUB_OUTPUT
-        echo "build_artifacts=$(ls $DIST_PATH/*.fap)" >> $GITHUB_OUTPUT
+        echo "build_artifacts=$(ls $DIST_PATH/*.fa[pl])" >> $GITHUB_OUTPUT
         echo "suffix=${{ fromJSON(steps.ufbt-status.outputs.json).target }}-api-$API_VERSION-${{ fromJSON(steps.ufbt-status.outputs.json).version }}" >> $GITHUB_OUTPUT
 
     - name: Lint sources
