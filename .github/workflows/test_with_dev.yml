@@ -1,0 +1,9 @@
+on:
+  [push]
+
+jobs:
+  run-test-on-latest:
+    uses: ./.github/workflows/test_ufbt.yml
+    with:
+      ufbt-version: prerelease
+      sdk-channel: dev

@@ -1,4 +1,18 @@
-on: [push]
+on: 
+  workflow_call:
+    inputs:
+      ufbt-version:
+        description: 'ufbt version to use'
+        required: false
+        default: 'latest'
+      sdk-channel:
+        description: 'Release channel to use'
+        required: false
+        default: ''
+      sdk-file:
+        description: 'Path to SDK archive'
+        required: false
+        default: ''
 
 jobs:
   test_ubt_build_action:
@@ -11,9 +25,10 @@ jobs:
       - name: Setup ufbt
         uses: ./ # Uses an action in the root directory
         with:
-          ufbt-version: 'prerelease'
-          sdk-channel: 'dev'
-          task: 'none'
+          ufbt-version: ${{ inputs.ufbt-version }}
+          sdk-channel: ${{ inputs.sdk-channel }}
+          sdk-file: ${{ inputs.sdk-file }}
+          task: setup
 
       - name: Create app
         id: create-app
@@ -28,15 +43,6 @@ jobs:
         with:
           skip-setup: true
           path: 'test'
-
-      - name: Build test app for unleashed
-        uses: ./
-        id: build-app-unleashed
-        with:
-          skip-setup: true
-          path: 'test'
-          sdk-channel: 'dev'
-          sdk-index-url: https://up.unleashedflip.com/directory.json
 
       - name: Upload app artifacts
         uses: actions/upload-artifact@v3
