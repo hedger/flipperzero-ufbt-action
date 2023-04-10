@@ -71,7 +71,7 @@ outputs:
 
   suffix:
     description: "String, combination of hardware target, API version & SDK version. Set by build task"
-    value: ${{ fromJSON(steps.ufbt-status.outputs.json).ufbt_version }}
+    value: ${{ steps.build-fap.outputs.suffix }}
 
   ufbt-status:
     description: JSON status object for ufbt. Use with fromJSON()
@@ -178,9 +178,11 @@ runs:
           # Exit with error code
           exit $BUILD_STATUS
         fi
-        echo "api_version=$(ufbt -s get_apiversion || echo 0.0)" >> $GITHUB_OUTPUT
+        API_VERSION=$(ufbt -s get_apiversion || echo 0.0)
+        echo "api_version=$API_VERSION" >> $GITHUB_OUTPUT
         echo "dist_dir=$DIST_PATH" >> $GITHUB_OUTPUT
         echo "build_artifacts=$(ls $DIST_PATH/*.fap)" >> $GITHUB_OUTPUT
+        echo "suffix=${{ fromJSON(steps.ufbt-status.outputs.json).target }}-api-$API_VERSION-${{ fromJSON(steps.ufbt-status.outputs.json).version }}" >> $GITHUB_OUTPUT
 
     - name: Lint sources
       id: lint-app
