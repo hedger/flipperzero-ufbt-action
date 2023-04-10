@@ -3,6 +3,11 @@ name: Run tests for ufbt action
 on: 
   workflow_call:
     inputs:
+      ufbt-action-source:
+        description: 'Path to ufbt action source'
+        type: string
+        required: false
+        default: './'
       ufbt-version:
         description: 'ufbt version to use'
         type: string
@@ -28,7 +33,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup ufbt
-        uses: ./ # Uses an action in the root directory
+        uses: ${{ inputs.ufbt-action-source }} # Uses an action in the root directory
         with:
           ufbt-version: ${{ inputs.ufbt-version }}
           sdk-channel: ${{ inputs.sdk-channel }}
@@ -43,7 +48,7 @@ jobs:
           ufbt create APPID=test
 
       - name: Build test app
-        uses: ./
+        uses: ${{ inputs.ufbt-action-source }}
         id: build-app
         with:
           skip-setup: true
@@ -62,7 +67,7 @@ jobs:
           echo "static int testmain(int unused_i) { return 1; }" >> test/test.c
 
       - name: Lint broken app
-        uses: ./
+        uses: ${{ inputs.ufbt-action-source }}
         id: lint-broken-app
         continue-on-error: true
         with:
@@ -71,7 +76,7 @@ jobs:
           task: 'lint'
 
       - name: Build broken app
-        uses: ./
+        uses: ${{ inputs.ufbt-action-source }}
         id: build-broken-app
         continue-on-error: true
         with:
