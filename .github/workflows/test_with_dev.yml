@@ -1,5 +1,7 @@
+name: Test ufbt action with dev SDK
+
 on:
-  [push]
+  [push, pull_request]
 
 jobs:
   run-test-on-latest:
