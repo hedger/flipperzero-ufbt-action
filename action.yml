@@ -167,9 +167,10 @@ runs:
         FAP_SRC_PATH=$GITHUB_WORKSPACE/${{ inputs.path }}
         # Capture output with tee and error code
         # set -o pipefail
+        set +e
         cd $FAP_SRC_PATH 
         # LINT_MESSAGES=`ufbt lint 2>&1 | tee /dev/stderr`
-        LINT_MESSAGES="$(ufbt lint 2>&1)"
+        LINT_MESSAGES="$(ufbt lint 2>&1 | tee /dev/stderr)"
         echo "Lint status: $LINT_STATUS"
         LINT_STATUS=$?
         # Capture error code
