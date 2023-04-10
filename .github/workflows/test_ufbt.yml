@@ -5,14 +5,17 @@ on:
     inputs:
       ufbt-version:
         description: 'ufbt version to use'
+        type: string
         required: false
         default: 'latest'
       sdk-channel:
         description: 'Release channel to use'
+        type: string
         required: false
         default: ''
       sdk-file:
         description: 'Path to SDK archive'
+        type: string
         required: false
         default: ''
 
