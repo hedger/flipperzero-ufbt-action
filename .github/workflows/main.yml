@@ -48,25 +48,25 @@ jobs:
         id: break-app
         shell: bash
         run: |
-          echo "static int testmain() { return 1; }" >> test/test.c
+          echo "static int testmain(int unused_i) { return 1; }" >> test/test.c
 
-      - name: Lint app
+      - name: Lint broken app
         uses: ./
-        id: lint-bad-app
+        id: lint-broken-app
         continue-on-error: true
         with:
           skip-setup: true
           path: 'test'
           task: 'lint'
 
-      - name: Build app
+      - name: Build broken app
         uses: ./
-        id: build-bad-app
+        id: build-broken-app
         continue-on-error: true
         with:
           skip-setup: true
           path: 'test'
 
       - name: Fail if lint succeeded
-        if: steps.lint-bad-app.outcome == 'success' || steps.build-bad-app.outcome == 'success'
+        if: steps.lint-broken-app.outcome == 'success' || steps.build-broken-app.outcome == 'success'
         run: exit 1
