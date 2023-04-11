@@ -2,12 +2,12 @@ name: ufbt wrapper action
 author: "@flipperdevices"
 description: Configures ufbt for building and linting Flipper applications
 branding:
-  icon: 'package'
+  icon: 'cpu'
   color: 'orange'
 
 inputs:
-  path:
-    description: Path to source code (if not the root of repository)
+  app-dir:
+    description: Path to application's source code (if not the root of repository)
     required: false
     default: "."
 
@@ -15,6 +15,11 @@ inputs:
     description: "Task to run. Valid values: 'build', 'lint', 'setup'"
     required: false
     default: build
+
+  skip-setup:
+    description: Skip ufbt setup. Useful for multiple invocation of the action
+    required: false
+    default: ${{ false }}
 
   sdk-channel:
     description: Release channel to use. Matches argument "--channel" for ufbt update
@@ -51,10 +56,6 @@ inputs:
     required: false
     default: latest
 
-  skip-setup:
-    description: Skip ufbt setup. Useful for multiple invocation of the action
-    required: false
-    default: ${{ false }}
 
 outputs:
   fap-artifacts:
@@ -74,7 +75,7 @@ outputs:
     value: ${{ steps.build-fap.outputs.suffix }}
 
   lint-messages:
-    description: Lint messages. Set by lint task
+    description: Linter output. Set by lint task
     value: ${{ steps.lint-app.outputs.lint-messages }}
 
   ufbt-status:
@@ -163,7 +164,7 @@ runs:
       shell: bash
       run: |
         set +e
-        FAP_SRC_PATH=`realpath $GITHUB_WORKSPACE/${{ inputs.path }}`
+        FAP_SRC_PATH=`realpath $GITHUB_WORKSPACE/${{ inputs.app-dir }}`
         DIST_PATH=$FAP_SRC_PATH/dist
         cd $FAP_SRC_PATH
         BUILD_MESSAGES="$(ufbt -s 2>&1 | tee /dev/stderr)"
@@ -193,7 +194,7 @@ runs:
       shell: bash
       run: |
         set +e
-        cd $GITHUB_WORKSPACE/${{ inputs.path }} 
+        cd $GITHUB_WORKSPACE/${{ inputs.app-dir }} 
         LINT_MESSAGES="$(ufbt lint -s 2>&1 | tee /dev/stderr)"
         LINT_STATUS=${PIPESTATUS[0]}
         if [ "$LINT_STATUS" -eq 0 ]; then

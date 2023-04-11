@@ -3,11 +3,6 @@ name: Run tests for ufbt action
 on: 
   workflow_call:
     inputs:
-      ufbt-action-source:
-        description: 'Path to ufbt action source'
-        type: string
-        required: false
-        default: './'
       ufbt-version:
         description: 'ufbt version to use'
         type: string
@@ -44,7 +39,8 @@ jobs:
         id: create-app
         shell: bash
         run: |
-          mkdir test; cd test
+          mkdir test
+          cd test
           ufbt create APPID=test
 
       - name: Build test app
@@ -52,7 +48,7 @@ jobs:
         id: build-app
         with:
           skip-setup: true
-          path: 'test'
+          app-dir: 'test'
 
       - name: Upload app artifacts
         uses: actions/upload-artifact@v3
@@ -72,7 +68,7 @@ jobs:
         continue-on-error: true
         with:
           skip-setup: true
-          path: 'test'
+          app-dir: 'test'
           task: 'lint'
 
       - name: Build broken app
@@ -81,8 +77,8 @@ jobs:
         continue-on-error: true
         with:
           skip-setup: true
-          path: 'test'
+          app-dir: 'test'
 
-      - name: Fail if lint succeeded
+      - name: Fail if lint or build of broken app succeeded
         if: steps.lint-broken-app.outcome == 'success' || steps.build-broken-app.outcome == 'success'
         run: exit 1
